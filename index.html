@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оплата частинами від кількох банків — UX-дослідження для Сільпо</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --line:#242833; --text:#e7e9ee; --muted:#9aa1 b0;
+    --muted:#9aa1b0; --accent:#ff5a1f; --accent2:#ffd23f; --good:#33c481; --priv:#5aa02c;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px 80px}
+  header.hero{padding:64px 20px 40px;text-align:center;
+    background:radial-gradient(1200px 400px at 50% -50%, rgba(255,90,31,.18), transparent 70%)}
+  .hero .tag{display:inline-block;font-size:13px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent2);border:1px solid var(--line);border-radius:999px;padding:6px 14px;margin-bottom:18px}
+  h1{font-size:38px;line-height:1.15;margin:0 0 14px;font-weight:800}
+  h1 span{color:var(--accent)}
+  .sub{color:var(--muted);max-width:640px;margin:0 auto;font-size:18px}
+  .meta{margin-top:22px;color:var(--muted);font-size:13px}
+  h2{font-size:26px;margin:56px 0 6px;font-weight:800;scroll-margin-top:20px}
+  h3{font-size:18px;margin:28px 0 8px}
+  p{margin:10px 0}
+  .lead{color:var(--muted);margin-top:2px}
+  a{color:var(--accent2)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin:18px 0}
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:1fr 1fr}
+  @media(max-width:720px){.g2{grid-template-columns:1fr}}
+  .shots{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x mandatory}
+  .shots figure{margin:0;flex:0 0 auto;width:230px;scroll-snap-align:start}
+  .shots img{width:230px;border-radius:12px;border:1px solid var(--line);display:block;background:#000}
+  .shots figcaption{color:var(--muted);font-size:13px;margin-top:8px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  .pill{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line)}
+  .pill.priv{color:#bfe08a;border-color:#3c5a1f;background:#1b2411}
+  .pill.warn{color:#ffcf8a;border-color:#5a441f;background:#241d11}
+  ul.clean{list-style:none;padding:0;margin:10px 0}
+  ul.clean li{padding:8px 0 8px 28px;position:relative;border-bottom:1px solid var(--line)}
+  ul.clean li:before{content:"→";position:absolute;left:4px;color:var(--accent)}
+  .steps{counter-reset:s;list-style:none;padding:0;margin:10px 0}
+  .steps li{counter-increment:s;position:relative;padding:14px 0 14px 52px;border-bottom:1px solid var(--line)}
+  .steps li:before{content:counter(s);position:absolute;left:0;top:12px;width:32px;height:32px;
+    border-radius:50%;background:var(--accent);color:#111;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .callout{border:1px solid #4a3f1f;background:#1c1d17;border-radius:10px;padding:14px 16px;margin:16px 0;color:#e9e4c8;font-size:14.5px}
+  .callout b:first-child{color:var(--accent2)}
+  .toc{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 0}
+  .toc a{font-size:14px;color:var(--text);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:var(--card)}
+  footer{margin-top:70px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center}
+  code{background:#0b0d11;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">UX Research · Product Design</span>
+    <h1>«Оплата частинами» від <span>кількох банків</span><br>в одному UI</h1>
+    <p class="sub">Як зрозуміло показати розтермінування ПриватБанку разом із чинною пропозицією Банку Восток у checkout Сільпо. Бенчмарк на реальних мобільних і десктопних інтерфейсах українського e-commerce.</p>
+    <div class="meta">Мобайл + десктоп · Playwright 390×844 і 1440×900 · 2026-07-28 · дослідження для Сільпо</div>
+    <nav class="toc">
+      <a href="#tldr">Висновки</a>
+      <a href="#allo">Allo</a>
+      <a href="#moyo">MOYO</a>
+      <a href="#ecodrive">Ecodrive</a>
+      <a href="#other">Foxtrot / Rozetka</a>
+      <a href="#dvm">Десктоп vs мобайл</a>
+      <a href="#patterns">Патерни</a>
+      <a href="#reco">Рекомендації</a>
+      <a href="#happy">Happy path</a>
+      <a href="#open">Відкриті питання</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section id="tldr">
+    <h2>Головні висновки</h2>
+    <p class="lead">Ринковий стандарт для «кількох банків в одному екрані».</p>
+    <div class="card">
+      <ul class="clean">
+        <li>Кілька банків = <b>єдина модалка «Кредитні пропозиції»</b> зі списком <b>карток-радіо</b>, де кожен банк — окрема картка. Це прибирає відчуття дублікатів.</li>
+        <li>Кожен банк зберігає <b>власну назву продукту</b>: ПриватБанк — «Оплата частинами», Монобанк — «Купівля частинами», ПУМБ — «Сплачуйте частинами», А-Банк — «Плати частинами».</li>
+        <li>Кількість платежів — <b>окремий дропдаун у кожній картці</b>, не спільний перемикач.</li>
+        <li>Обов'язково в картці: <b>лого + назва банку + назва продукту</b>, <b>щомісячний платіж</b>, <b>повна вартість</b>.</li>
+        <li>Внизу — <b>sticky-підсумок</b> (обраний строк + щомісячно) і одна CTA.</li>
+        <li>MOYO додає верхній рівень — <b>групування за вигодою</b> («Без переплати» vs «Кредит, %»), що напряму вирішує «щоб не виглядали як дублікати».</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="allo">
+    <h2>Allo — еталон списку кількох банків</h2>
+    <p class="lead">Точка входу — кнопка «Кредит N&nbsp;₴/міс» під ціною. Далі модалка зі списком банків.</p>
+    <div class="shots">
+      <figure><img src="screens/allo-credit-modal.png" alt="Allo модалка"><figcaption>Модалка «Кредитні пропозиції»: ПриватБанк + Монобанк, картки-радіо</figcaption></figure>
+      <figure><img src="screens/allo-modal-scroll1.png" alt="Allo банки"><figcaption>Нижче — ПУМБ і А-Банк, кожен зі своєю назвою продукту</figcaption></figure>
+      <figure><img src="screens/allo-payments-open.png" alt="Allo дропдаун платежів"><figcaption>Кількість платежів, дропдаун у кожній картці (3/4/5/7/8…25)</figcaption></figure>
+      <figure><img src="screens/d-allo-modal.png" alt="Allo десктоп таблиця"><figcaption>Десктоп: таблиця на 7 банків з колонкою «% по кредиту»</figcaption></figure>
+    </div>
+    <table>
+      <tr><th>Банк</th><th>Назва продукту</th><th>Платежів</th><th>Щомісячно</th></tr>
+      <tr><td>ПриватБанк</td><td>Оплата частинами</td><td>25</td><td>4 320 ₴</td></tr>
+      <tr><td>Монобанк</td><td>Купівля частинами</td><td>15</td><td>7 200 ₴</td></tr>
+      <tr><td>ПУМБ</td><td>Сплачуйте частинами</td><td>20</td><td>5 400 ₴</td></tr>
+      <tr><td>А-Банк</td><td>Плати частинами</td><td>22</td><td>4 910 ₴</td></tr>
+    </table>
+    <p><b>Що працює:</b> один список → легко порівняти щомісячний платіж; сума видно ще до відкриття модалки; власна назва продукту прибирає плутанину «це те саме чи ні».</p>
+  </section>
+
+  <section id="moyo">
+    <h2>MOYO — групування за вигодою для клієнта</h2>
+    <p class="lead">У кошику — блок «Кредитні пропозиції» з вкладками за типом вартості.</p>
+    <div class="shots">
+      <figure><img src="screens/moyo-installment-modal.png" alt="MOYO без переплати"><figcaption>Вкладка «Без переплати»: ПриватБанк «Оплата частинами», 4 платежі</figcaption></figure>
+      <figure><img src="screens/moyo-m-2-credit-tab.png" alt="MOYO кредит %"><figcaption>Вкладка «Кредит, %»: «Миттєва розстрочка», інша вартість</figcaption></figure>
+      <figure><img src="screens/d-moyo-modal.png" alt="MOYO десктоп"><figcaption>Десктоп: та сама модалка кошика, горизонтальний однорядковий layout</figcaption></figure>
+    </div>
+    <p><b>Що працює:</b> поділ «Без переплати / Кредит, %» одразу показує різницю між пропозиціями — головний антидублікатний прийом. Звичайна оплата й розтермінування співіснують на одному екрані («Купити» vs «Оформити кредит»).</p>
+  </section>
+
+  <section id="ecodrive">
+    <h2>Ecodrive — прозорість переплати</h2>
+    <p class="lead">Магазин електротранспорту (високий чек), промотує «Оплату частинами під 0%» на головній.</p>
+    <div class="shots">
+      <figure><img src="screens/ecodrive-mobile-modal.png" alt="Ecodrive мобайл"><figcaption>Мобайл: Monobank + ПриватБанк (2 продукти), явна «Переплата» і «Всього до сплати»</figcaption></figure>
+      <figure><img src="screens/ecodrive-desktop-modal.png" alt="Ecodrive десктоп"><figcaption>Десктоп: та сама модалка «В кредит» з радіо-списком банків</figcaption></figure>
+      <figure><img src="screens/ecodrive-desktop-home.png" alt="Ecodrive банер"><figcaption>Промо «Оплата частинами під 0%» на головному банері</figcaption></figure>
+    </div>
+    <table>
+      <tr><th>Банк</th><th>Програма</th><th>Діапазон</th><th>Приклад</th></tr>
+      <tr><td>Monobank</td><td>Покупка частинами</td><td>2–9 платежів</td><td>3 × 16 164 грн, переплата 1 грн</td></tr>
+      <tr><td>ПриватБанк</td><td>Оплата частинами</td><td>2–11 платежів</td><td>2 × 24 245 грн</td></tr>
+      <tr><td>ПриватБанк</td><td>Миттєва розстрочка</td><td>2–24 платежі</td><td>з переплатою</td></tr>
+    </table>
+    <p><b>Що працює:</b> рядки «Переплата X грн» і «Всього до сплати» знімають головне питання «скільки я переплачу». Один банк (ПриватБанк) присутній двома продуктами, які розрізняються назвою + переплатою. Прямий аналог задачі Сільпо.</p>
+  </section>
+
+  <section id="other">
+    <h2>Foxtrot і Rozetka — контекст</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Foxtrot</h3>
+        <div class="shots"><figure><img src="screens/foxtrot-product-top.png" alt="Foxtrot"><figcaption>Мітка «Оплата частинами» на плитці + co-branding Sense у шапці</figcaption></figure></div>
+        <p>Патерн <b>раннього сигналу</b>: доступність розтермінування видно ще у списку товарів.</p>
+      </div>
+      <div class="card">
+        <h3>Rozetka <span class="pill warn">не верифіковано</span></h3>
+        <div class="shots"><figure><img src="screens/probe-rozetka.png" alt="Rozetka"><figcaption>Головна доступна; картка товару за Cloudflare Turnstile</figcaption></figure></div>
+        <p>Модалку зняти не вдалося (бот-захист). Агрегація банків — <b>припущення</b>, не підтверджене скріном.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="dvm">
+    <h2>Десктоп vs мобайл</h2>
+    <p class="lead">Той самий контент, різна компоновка.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Мобайл</h3>
+        <ul class="clean">
+          <li>Вертикальні картки-радіо (Allo, Ecodrive) або горизонтальний ряд (MOYO).</li>
+          <li>Банк, дропдаун платежів, щомісячний платіж один під одним.</li>
+          <li>Sticky-футер із підсумком і однією CTA.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Десктоп</h3>
+        <ul class="clean">
+          <li>Allo: таблиця порівняння (Пропозиції · Термін · Щомісячно · Вартість · % по кредиту · Умови), 7 банків одразу.</li>
+          <li>Колонка «% по кредиту» відділяє 0%-розтермінування від кредиту з переплатою.</li>
+          <li>MOYO: та сама модалка кошика, горизонтальний однорядковий layout.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><b>Для Сільпо:</b> на десктопі є місце для табличного порівняння банків у колонках; на мобайлі, стек карток. Ознаку «переплата / 0%» варто показувати на обох платформах.</div>
+  </section>
+
+  <section id="patterns">
+    <h2>Зведення патернів</h2>
+    <table>
+      <tr><th>Питання</th><th>Що роблять конкуренти</th></tr>
+      <tr><td>Показ доступності</td><td>Щомісячний платіж на кнопці (Allo); мітка на плитці (Foxtrot); блок у кошику (MOYO)</td></tr>
+      <tr><td>Групування банків</td><td>Єдиний список карток-радіо (Allo); вкладки за типом вартості → банк (MOYO)</td></tr>
+      <tr><td>Пояснення умов</td><td>Згортки «Як скористатися / Читати умови» в картці (Allo); опис зверху (MOYO)</td></tr>
+      <tr><td>Вибір к-сті платежів</td><td>Окремий дропдаун у кожній картці банку</td></tr>
+      <tr><td>Лого / назва / платіж</td><td>Лого + назва банку + власна назва продукту + щомісячний + повна вартість</td></tr>
+      <tr><td>Організація в checkout</td><td>Розтермінування — один зі способів оплати; sticky-підсумок + одна CTA</td></tr>
+    </table>
+  </section>
+
+  <section id="reco">
+    <h2>Рекомендації для Сільпо</h2>
+    <p class="lead">Поєднання ПриватБанк «Оплата частинами» + Банк Восток.</p>
+    <ul class="clean">
+      <li><b>Один блок «Оплата частинами»</b>, а не два способи оплати. Всередині — вибір банку. Інакше два майже однакові рядки = відчуття дублікатів.</li>
+      <li><b>Кожен банк — окрема картка-радіо</b> зі своїм лого й назвою (Восток і Приват візуально різні).</li>
+      <li><b>Зберігати власну назву продукту банку</b> — не уніфікувати в безлике «розтермінування».</li>
+      <li><b>Кількість платежів — дропдаун у кожній картці</b>, з миттєвим перерахунком «щомісячно».</li>
+      <li><b>Щомісячний платіж — якомога раніше</b>: на рівні способу оплати «від X ₴/міс».</li>
+      <li><b>Якщо умови банків різні за вартістю</b> — додати верхній рівень «Без переплати / З переплатою» (патерн MOYO). Якщо обидва без переплати — простий список.</li>
+    </ul>
+    <div class="callout"><b>Анти-патерни:</b> два окремі пункти «Розтермінування Восток» і «Розтермінування Приват» на одному рівні зі звичайною оплатою; однакові іконки/назви; спільний перемикач платежів на два банки з різними лімітами; прихований щомісячний платіж.</div>
+  </section>
+
+  <section id="happy">
+    <h2>Happy path</h2>
+    <p class="lead">Від вибору способу оплати до успішного замовлення (Приват разом із Восток).</p>
+    <ol class="steps">
+      <li><b>Крок оплати.</b> У списку способів — «Оплата частинами» з підписом «від N ₴/міс, 2 банки».</li>
+      <li><b>Розкривається вибір банку</b> (акордеон / bottom-sheet): картка ПриватБанк «Оплата частинами» + картка Банк Восток «Оплата частинами». Опційно — вкладки «Без переплати / З переплатою».</li>
+      <li><b>Користувач обирає ПриватБанк</b> — картка підсвічується, радіо залите.</li>
+      <li><b>Обирає кількість платежів</b> у дропдауні → «Щомісячно» миттєво перераховується.</li>
+      <li><b>Sticky-підсумок</b> оновлюється: «ПриватБанк · 4 платежі · X ₴/міс» + CTA «Оформити частинами».</li>
+      <li><b>Перехід у флоу банку</b> (деталізація на боці банку — поза межами задачі).</li>
+      <li><b>Екран успіху:</b> «Замовлення оформлено», графік першого платежу, номер замовлення.</li>
+    </ol>
+  </section>
+
+  <section id="open">
+    <h2>Відкриті питання та припущення</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Уточнити до фінального UI</h3>
+        <ul class="clean">
+          <li>Точні умови банків: платежі, ліміти, переплата/комісія для покупця?</li>
+          <li>Обидва звуться «Оплата частинами» — чи потрібен диференціатор?</li>
+          <li>Дефолтний банк / пріоритет (комерційна домовленість)?</li>
+          <li>Платформа першою: застосунок, мобільний веб, десктоп?</li>
+          <li>Розтермінування — для будь-якого кошика чи від порогу суми?</li>
+          <li>Вибір банку: inline-акордеон чи bottom-sheet?</li>
+          <li>Кешбек «Власний рахунок» — чи діє з розтермінуванням?</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Припущення <span class="pill warn">потребують підтвердження</span></h3>
+        <ul class="clean">
+          <li>Обидва банки — без переплати для покупця на основний строк.</li>
+          <li>Розтермінування рахується на суму всього замовлення.</li>
+          <li>Прототип — мобільний (390px).</li>
+          <li>Візуальна мова — з мобільної головної Сільпо.</li>
+          <li>Rozetka-агрегація не верифікована скріном.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Дослідження підготовлено як бенчмарк для продуктової команди Сільпо · Скріншоти зроблено з публічних мобільних сторінок конкурентів (Playwright) · Умови банків — орієнтовні, підлягають підтвердженню.
+  </footer>
+</div>
+</body>
+</html>
