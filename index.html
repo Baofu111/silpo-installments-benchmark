@@ -71,6 +71,7 @@
       <a href="#ecodrive">Ecodrive</a>
       <a href="#dvm">Десктоп vs мобайл</a>
       <a href="#touch">Точки дотику</a>
+      <a href="#intl">Світові патерни</a>
       <a href="#patterns">Патерни</a>
       <a href="#reco">Рекомендації</a>
       <a href="#happy">Happy path</a>
@@ -94,6 +95,7 @@
         <li>Внизу — <b>sticky-підсумок</b> (обраний строк + щомісячно) і одна CTA.</li>
         <li>MOYO додає верхній рівень — <b>групування за вигодою</b> («Без переплати» vs «Кредит, %»), що напряму вирішує «щоб не виглядали як дублікати».</li>
         <li><b>Вигоду видно ще до checkout:</b> конкуренти виводять щомісячний платіж «від X ₴/міс» вторинною кнопкою на картці товару (і банером/міткою), а не лише на кроці оплати.</li>
+        <li><b>Світовий контекст:</b> за кордоном ритейлер зазвичай показує <b>один агрегатор</b> (Klarna, Kueski), який ховає вибір планів усередині, а не кілька банків поряд. Тому модель «кілька банків в одному UI» ближча до українського / LatAm мультибанку. Деталі — розділ «Світові патерни».</li>
       </ul>
     </div>
   </section>
@@ -189,6 +191,33 @@
       <tr><td>Checkout</td><td>усі</td><td>Спосіб оплати + вибір банку</td></tr>
     </table>
     <div class="callout"><b>Для Сільпо:</b> показувати щомісячний платіж «від X ₴/міс» вторинною кнопкою на картці товару (другорядною до «Купити», з логотипами Приват + Восток), а не тільки на кроці оплати. За потреби, мітка в каталозі чи банер для обізнаності.</div>
+  </section>
+
+  <section id="intl">
+    <h2>Світові патерни BNPL</h2>
+    <p class="lead">Погляд за межі українського ринку: Klarna (EU/US), Zip (AU), Kueski (LatAm). Метод — desk research; умови орієнтовні, метрики наведено як заяви джерел.</p>
+    <div class="callout"><b>Метод:</b> міжнародні grocery-checkout закриті гео/логіном/антиботом (Carrefour, Woolworths, Affirm, Walmart — Cloudflare). Реально зняті лише лендінги провайдерів; решта — публічні UX-гайдлайни й огляди. Деталі та джерела — у <code>INTERNATIONAL.md</code>.</div>
+    <div class="shots">
+      <figure><img src="screens/intl-klarna-installments.png" alt="Klarna installments"><figcaption>Klarna: «How installments work» (at checkout / after purchase / post-purchase) + плани Pay in 30 / Pay in 4 / Financing</figcaption></figure>
+      <figure><img src="screens/intl-kueski-pay.png" alt="Kueski Pay"><figcaption>Kueski Pay (MX): «Pago en Quincenas», без картки й кредитної історії — фінансова інклюзія</figcaption></figure>
+      <figure><img src="screens/intl-instacart.png" alt="Instacart"><figcaption>Instacart (US): grocery-маркетплейс із BNPL Klarna + PayPal Pay Later як окремими способами оплати</figcaption></figure>
+    </div>
+    <table>
+      <tr><th>Кейс</th><th>Модель</th><th>Наскільки прямий аналог Приват+Восток</th></tr>
+      <tr><td>Carrefour + Klarna (FR)</td><td>1 агрегатор; вибір планів усередині Klarna</td><td>Частковий — вибір <b>планів</b>, не банків</td></tr>
+      <tr><td>Woolworths + Zip (AU)</td><td>Wallet: Zip Visa-картка / gift card, не inline</td><td>Слабкий — обхідна механіка</td></tr>
+      <tr><td>Instacart / Walmart (US)</td><td>Instacart: кілька провайдерів окремо; Walmart: ексклюзив (Affirm→Klarna)</td><td>Частковий; Instacart — радше анти-патерн</td></tr>
+      <tr><td>Rappi / Amazon MX + Kueski</td><td>Без картки й історії; біквіклі-платежі, аплікація в checkout</td><td>Найближчий за духом (LatAm мультиметод)</td></tr>
+    </table>
+    <h3>Що переноситься на Сільпо</h3>
+    <ul class="clean">
+      <li><b>Messaging під ціною до checkout</b> — універсальний патерн («Pay in 4», «€20/mo»). Klarna заявляє +25% AOV. Підтверджує нашу секцію «Точки дотику».</li>
+      <li><b>Явний графік і локалізований ритм</b>: EU — кожні 30 днів, US — кожні 2 тижні, LatAm — quincenas, UA-банки — місячні. Ритм показувати прямо.</li>
+      <li><b>Нативна інтеграція проти wallet-обхідних</b>: Zip/Klarna-картка з copy-paste — гірший UX. Аргумент за вбудований вибір Приват+Восток у checkout Сільпо.</li>
+      <li><b>Без картки / низький бар'єр</b> (Kueski) — резонує з UA; аплікація в потоці, не окремим кроком.</li>
+      <li><b>Pre-select обраного банку</b> для повернених (Klarna).</li>
+    </ul>
+    <div class="callout"><b>Головний висновок:</b> у світі норма — <b>один агрегатор ховає вибір планів</b>, а не ритейлер показує кілька банків. Тому кейс Сільпо ближчий до українського / LatAm мультибанку, ніж до Klarna-моделі. Захід дає корисні мікро-патерни, але шаблон «кілька банків в одному UI» краще брати з українського бенчмарку (Allo, MOYO, Ecodrive). Там, де провайдерів кілька і їх подають окремо (Instacart), виникає саме та плутанина-дублікат, якої ми уникаємо.</div>
   </section>
 
   <section id="patterns">
