@@ -3,3 +3,4 @@ package-lock.json
 package.json
 *.log
 screens/_*.png
+.impeccable/
